@@ -181,7 +181,6 @@ else:
             InlineKeyboardButton("ɴᴇxᴛ ⪼", callback_data=f"next_{req}_{key}_{n_offset}")
         ]
     )
-
     if settings["link"]:
     links = ""
     for file_num, file in enumerate(files, start=offset+1):
