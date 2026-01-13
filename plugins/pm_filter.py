@@ -119,16 +119,14 @@ async def next_page(bot, query):
 
     if not settings["is_verify"]:
         btn.insert(0,[
-            InlineKeyboardButton("♻️ sᴇɴᴅ ᴀʟʟ", callback_data=f"send_all#{key}"),
-            InlineKeyboardButton("📰 ʟᴀɴɢᴜᴀɢᴇs", callback_data=f"languages#{key}#{req}#{offset}")
-        ])
+    InlineKeyboardButton("📂 sᴇᴀsᴏɴ", callback_data=f"season#{key}#{req}#0"),
+    InlineKeyboardButton("🎞 qᴜᴀʟɪᴛʏ", callback_data=f"quality#{key}#{req}#0")
+])
 
-
-    else:
-        btn.insert(0,[
-            InlineKeyboardButton("♻️ sᴇɴᴅ ᴀʟʟ", callback_data=f"send_all#{key}"),
-            InlineKeyboardButton("📰 ʟᴀɴɢᴜᴀɢᴇs", callback_data=f"languages#{key}#{req}#{offset}")
-        ])
+btn.insert(1,[
+    InlineKeyboardButton("♻️ sᴇɴᴅ ᴀʟʟ", callback_data=f"send_all#{key}"),
+    InlineKeyboardButton("📰 ʟᴀɴɢᴜᴀɢᴇs", callback_data=f"languages#{key}#{req}#0")
+])
 
     if 0 < offset <= int(MAX_BTN):
         off_set = 0
@@ -182,6 +180,49 @@ async def languages_cb_handler(client: Client, query: CallbackQuery):
     d=await query.message.edit_text("<b>ɪɴ ᴡʜɪᴄʜ ʟᴀɴɢᴜᴀɢᴇ ʏᴏᴜ ᴡᴀɴᴛ, ᴄʜᴏᴏsᴇ ʜᴇʀᴇ 👇</b>", reply_markup=InlineKeyboardMarkup(btn), disable_web_page_preview=True)
     await asyncio.sleep(600)
     await d.delete()
+    
+@Client.on_callback_query(filters.regex(r"^season#"))
+async def season_cb(client, query):
+    _, key, req, offset = query.data.split("#")
+    if int(req) != query.from_user.id:
+        return await query.answer("This is not for you!", show_alert=True)
+
+    btn = [
+        [
+            InlineKeyboardButton("Season 1", callback_data=f"season_select#1#{key}#{req}"),
+            InlineKeyboardButton("Season 2", callback_data=f"season_select#2#{key}#{req}")
+        ],
+        [
+            InlineKeyboardButton("⪻ Back", callback_data=f"next_{req}_{key}_{offset}")
+        ]
+    ]
+
+    await query.message.edit_reply_markup(
+        reply_markup=InlineKeyboardMarkup(btn)
+    )
+
+@Client.on_callback_query(filters.regex(r"^quality#"))
+async def quality_cb(client, query):
+    _, key, req, offset = query.data.split("#")
+    if int(req) != query.from_user.id:
+        return await query.answer("This is not for you!", show_alert=True)
+
+    btn = [
+        [
+            InlineKeyboardButton("480p", callback_data=f"quality_select#480#{key}#{req}"),
+            InlineKeyboardButton("720p", callback_data=f"quality_select#720#{key}#{req}")
+        ],
+        [
+            InlineKeyboardButton("1080p", callback_data=f"quality_select#1080#{key}#{req}")
+        ],
+        [
+            InlineKeyboardButton("⪻ Back", callback_data=f"next_{req}_{key}_{offset}")
+        ]
+    ]
+
+    await query.message.edit_reply_markup(
+        reply_markup=InlineKeyboardMarkup(btn)
+    )
 
 @Client.on_callback_query(filters.regex(r"^lang_search"))
 async def lang_search(client: Client, query: CallbackQuery):
